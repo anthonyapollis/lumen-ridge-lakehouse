@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lumen Ridge Lakehouse · The ebook</title>
+<meta name="description" content="Twelve chapters on rehearsing an Azure Databricks lakehouse for a fictional gaming operator: architecture, integrity, reconciliation, cost and dev/prod.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<div class="wrap">
+  <nav class="top"><a class="brand" href="./">Lumen Ridge Lakehouse</a><a href="#ch1">Start</a><a href="#ch11">Lessons</a><a href="#figures">Figures</a></nav>
+
+  <div class="kicker">The ebook · 12 chapters · about 25 minutes</div>
+  <h1>Rehearsing a lakehouse before the real data arrives</h1>
+  <p class="lede">What a small team learned by building the whole Lumen Ridge platform on synthetic data first: what worked, what it cost, and what we would never do again.</p>
+
+  <ol class="toc">
+    <li><a href="#ch1">The brief and the budget</a></li><li><a href="#ch2">Synthetic data that misbehaves</a></li>
+    <li><a href="#ch3">The architecture</a></li><li><a href="#ch4">Landing without duplicates</a></li>
+    <li><a href="#ch5">Silver rules as data</a></li><li><a href="#ch6">Gold and the 53-second summaries</a></li>
+    <li><a href="#ch7">Reconciliation first</a></li><li><a href="#ch8">What it cost</a></li>
+    <li><a href="#ch9">Dev and prod</a></li><li><a href="#ch10">Catalogue and reports</a></li>
+    <li><a href="#ch11">Lessons for the real project</a></li><li><a href="#ch12">Epilogue: switching it off</a></li>
+  </ol>
+
+  <section id="ch1">
+    <div class="chapter-num">Chapter 1</div>
+    <h2>The brief and the budget</h2>
+    <p>Lumen Ridge runs an online casino and sportsbook, a wallet and payments stack, and a few hundred retail betting shops with cashiers, terminals and shifts. The real platform will pull from seven sources: five APIs, one PostgreSQL database and one file feed. Finance needs internal figures to agree with gateways and banks to within 0.1 percent, with every difference explained.</p>
+    <p>The constraint that shaped everything was money: a USD 200 monthly budget, email alerts at USD 100, 150, 176, 190 and 200, and an automated kill switch that stops all compute at USD 190. Every design choice in this book starts from that number.</p>
+    <div class="callout">Rule zero: default to the cheapest safe option, and state the cost of anything new before building it.</div>
+  </section>
+
+  <section id="ch2">
+    <div class="chapter-num">Chapter 2</div>
+    <h2>Synthetic data that misbehaves</h2>
+    <p>Clean demo data proves nothing. Two generators produced a "dirty" month instead: late-arriving rows, exact re-sends of whole files, two different versions of a bet with the same timestamp, settlements that never arrive, and reference snapshots that change under the facts. The online generator is fingerprinted, so data from different code versions can never be mixed in one load.</p>
+    <table>
+      <thead><tr><th>Dataset</th><th>Days</th><th class="n">Rows landed</th><th>Built with</th></tr></thead>
+      <tbody>
+        <tr><td>Online casino, sportsbook, wallet, payments</td><td>30</td><td class="n">106.7M</td><td>Notebooks (Bronze, Silver, Gold)</td></tr>
+        <tr><td>Retail slips, bets, cash, floats, shifts</td><td>about 30</td><td class="n">114.9M</td><td>COPY INTO + dbt</td></tr>
+        <tr><td>Gold daily summaries</td><td>all</td><td class="n">about 163k</td><td>dbt tables</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="ch3">
+    <div class="chapter-num">Chapter 3</div>
+    <h2>The architecture</h2>
+    <p>The platform is a medallion lakehouse in Azure Databricks with Unity Catalog. Bronze keeps every delivered version, never updated. Silver keeps the latest valid version per key and sends everything else to quarantine with a reason. Gold is a star schema with declared grains, and money lives on exactly one fact per process so joins cannot double count. All compute is serverless and stops when idle.</p>
+    <figure class="figure" id="fig1">
+      <svg viewBox="0 0 940 250" width="940" height="250" role="img" aria-label="Pipeline from source to Power BI with four fail-closed gates">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+        <g font-size="13" text-anchor="middle">
+          <rect x="10" y="70" width="110" height="56" rx="6" fill="var(--slate-soft)" stroke="var(--slate)"/><text x="65" y="94" fill="var(--ink)" font-weight="600">Source</text><text x="65" y="112" fill="var(--muted)" font-size="11.5">API · DB · file</text>
+          <rect x="170" y="70" width="110" height="56" rx="6" fill="var(--copper-soft)" stroke="var(--copper)"/><text x="225" y="94" fill="var(--ink)" font-weight="600">Bronze</text><text x="225" y="112" fill="var(--muted)" font-size="11.5">append-only</text>
+          <rect x="330" y="70" width="110" height="56" rx="6" fill="var(--teal-soft)" stroke="var(--teal)"/><text x="385" y="94" fill="var(--ink)" font-weight="600">Silver</text><text x="385" y="112" fill="var(--muted)" font-size="11.5">latest per key</text>
+          <rect x="490" y="70" width="110" height="56" rx="6" fill="var(--slate-soft)" stroke="var(--slate)"/><text x="545" y="94" fill="var(--ink)" font-weight="600">Gold</text><text x="545" y="112" fill="var(--muted)" font-size="11.5">facts · dims</text>
+          <rect x="650" y="70" width="120" height="56" rx="6" fill="var(--teal-soft)" stroke="var(--teal)"/><text x="710" y="94" fill="var(--ink)" font-weight="600">Summaries</text><text x="710" y="112" fill="var(--muted)" font-size="11.5">day × shop</text>
+          <rect x="820" y="70" width="110" height="56" rx="6" fill="var(--copper-soft)" stroke="var(--copper)"/><text x="875" y="94" fill="var(--ink)" font-weight="600">Power BI</text><text x="875" y="112" fill="var(--muted)" font-size="11.5">summaries first</text>
+        </g>
+        <g stroke="var(--muted)" stroke-width="1.4" fill="none" marker-end="url(#a1)">
+          <path d="M120 98 H168"/><path d="M280 98 H328"/><path d="M440 98 H488"/><path d="M600 98 H648"/><path d="M770 98 H818"/>
+        </g>
+        <g font-size="11.5" text-anchor="middle" fill="var(--bad)">
+          <text x="145" y="60">manifest</text><text x="305" y="60">grain test</text><text x="465" y="60">unique + ladder</text><text x="625" y="60">sum = fact</text>
+        </g>
+        <g stroke="var(--bad)" stroke-width="1.2" stroke-dasharray="4 4" fill="none">
+          <path d="M145 104 V200"/><path d="M305 104 V200"/><path d="M465 104 V200"/><path d="M625 104 V200"/><path d="M145 200 H625"/>
+        </g>
+        <rect x="320" y="186" width="160" height="30" rx="15" fill="var(--bad-soft)" stroke="var(--bad)"/>
+        <text x="400" y="206" font-size="12.5" text-anchor="middle" fill="var(--bad)" font-weight="600">stop run + alert</text>
+      </svg>
+      <figcaption>Figure 1. One load, layer by layer. Each gate fails closed: a failed check stops the run before Gold or any report changes.</figcaption>
+    </figure>
+  </section>
+
+  <section id="ch4">
+    <div class="chapter-num">Chapter 4</div>
+    <h2>Landing without duplicates</h2>
+    <p>Every delivery arrives with a manifest: file checksum, size and row count. Nothing lands until all three match. Landing uses <code>COPY INTO</code>, which skips files it has already loaded, so a re-sent delivery cannot land twice. Every Bronze row carries its run id, source file, schema version and ingest time.</p>
+    <p>The rule that overrides everything else: Bronze may keep re-sent rows as audit history, but Silver and Gold hold exactly one row per declared grain. Each trusted Silver model declares its business key, compound keys included, and a <code>unique_grain</code> test fails the build before Gold is touched. A local run of 25 grain checks across Silver and Gold found zero duplicate keys, on data that deliberately contained re-sends.</p>
+  </section>
+
+  <section id="ch5">
+    <div class="chapter-num">Chapter 5</div>
+    <h2>Silver rules as data</h2>
+    <p>Retail Silver is generated from a rules file rather than hand-written: types, allowed values, parent checks and version rules live as data, and a script writes 58 dbt models from them. The latest version per key wins by change time, then ingest time, then payload hash. If the same key arrives twice with the same change time and different content, both versions go to quarantine as <code>CONFLICTING_DUPLICATE</code>: a silent pick would hide a source problem.</p>
+    <p>Only tables that earn their storage are tables. A small check fails the build if a dbt model becomes a table without a written reason, which turned eleven unnecessary intermediate tables into views.</p>
+  </section>
+
+  <section id="ch6">
+    <div class="chapter-num">Chapter 6</div>
+    <h2>Gold and the 53-second summaries</h2>
+    <p>The first Power BI refresh against the row-level facts ran for more than twenty minutes and kept the warehouse awake the whole time. The fix was upstream: seven daily summary tables in Gold (casino, sportsbook, wallet and payments by day and operator; retail bets, cash and shifts by day and shop). They built in 53 seconds for about four US cents, and tests prove each one equals its fact exactly in rows and money.</p>
+    <figure class="figure" id="fig2">
+      <svg viewBox="0 0 900 230" width="900" height="230" role="img" aria-label="Rows loaded by Power BI before and after summaries">
+        <g font-size="13" fill="var(--ink)">
+          <text x="10" y="58">Row-level facts</text><rect x="190" y="40" width="680" height="28" fill="var(--copper)"/><text x="860" y="59" text-anchor="end" fill="var(--paper)" font-weight="600">≈ 66,000,000 rows · 20+ min</text>
+          <text x="10" y="128">Gold summaries</text><rect x="190" y="110" width="3" height="28" fill="var(--teal)"/><text x="202" y="129" fill="var(--teal)" font-weight="600">≈ 163,000 rows · about 1 min of warehouse</text>
+        </g>
+        <text x="190" y="190" font-size="12" fill="var(--muted)">Bars to scale: the summaries are about 0.25% of the rows the report used to import.</text>
+      </svg>
+      <figcaption>Figure 2. The biggest cost win of the rehearsal came from moving aggregation upstream into Gold.</figcaption>
+    </figure>
+  </section>
+
+  <section id="ch7">
+    <div class="chapter-num">Chapter 7</div>
+    <h2>Reconciliation first</h2>
+    <p>Reconciliation is not a report at the end; it is a ladder of checks at every hop, each writing to an append-only results table with a cause code. When figures stop agreeing, the first failing rung tells you where to look.</p>
+    <table>
+      <thead><tr><th>Rung</th><th>Compares</th><th>Typical cause codes</th></tr></thead>
+      <tbody>
+        <tr><td>Source → file</td><td>manifest rows, money, checksum</td><td>SHORT_READ, HASH_MISMATCH</td></tr>
+        <tr><td>File → Bronze</td><td>rows and money landed</td><td>NOT_LANDED, DUPLICATE_LOAD</td></tr>
+        <tr><td>Bronze → Silver</td><td>accepted + quarantined + duplicates = Bronze keys</td><td>QUARANTINED, NOT_LOADED_TO_SILVER</td></tr>
+        <tr><td>Silver → Gold</td><td>key by key, money exact</td><td>MISSING_IN_GOLD, VALUE_MISMATCH</td></tr>
+        <tr><td>Gold → report</td><td>summary totals vs facts for the same window</td><td>REPORT_MISMATCH</td></tr>
+        <tr><td>Business rules</td><td>casino vs wallet, payment vs settlement, cash vs shift</td><td>MISSING_IN_WALLET, SETTLEMENT_NOT_DUE</td></tr>
+      </tbody>
+    </table>
+    <p>For the online month, Silver against Gold matched on all four checks. The cross-system breaks that remained were the ones the generator planted, each explained by a cause code.</p>
+  </section>
+
+  <section id="ch8">
+    <div class="chapter-num">Chapter 8</div>
+    <h2>What it cost, and why the bill disagreed</h2>
+    <p>Databricks reported USD 45.87 at list price for the first five days. Azure billed USD 5.89. The workspace was on a 14-day trial, so compute was free on the invoice, and the real charges were the network gateway (USD 4.74), a public IP and storage. The lesson: list-price usage tells you what drove cost; the cloud bill tells you what you pay. Track both, and decide what happens when the trial ends.</p>
+    <figure class="figure" id="fig3">
+      <svg viewBox="0 0 900 300" width="900" height="300" role="img" aria-label="Databricks list-price spend per day, 16 to 20 October">
+        <g stroke="var(--rule)" stroke-width="1"><path d="M80 250 H880"/><path d="M80 190 H880"/><path d="M80 130 H880"/><path d="M80 70 H880"/></g>
+        <g font-size="12" fill="var(--muted)" text-anchor="end"><text x="72" y="254">0</text><text x="72" y="194">5</text><text x="72" y="134">10</text><text x="72" y="74">15</text><text x="72" y="40">USD</text></g>
+        <g fill="var(--copper)">
+          <rect x="120" y="177.8" width="90" height="72.2"/><rect x="270" y="71.9" width="90" height="178.1"/><rect x="420" y="229.4" width="90" height="20.6"/><rect x="570" y="200.8" width="90" height="49.2"/><rect x="720" y="21.3" width="90" height="228.7"/>
+        </g>
+        <g font-size="12.5" text-anchor="middle" fill="var(--ink)" font-weight="600">
+          <text x="165" y="171">6.02</text><text x="315" y="65">14.84</text><text x="465" y="223">1.72</text><text x="615" y="194">4.10</text><text x="765" y="15">19.06</text>
+        </g>
+        <g font-size="12.5" text-anchor="middle" fill="var(--muted)"><text x="165" y="272">16 Oct</text><text x="315" y="272">17 Oct</text><text x="465" y="272">18 Oct</text><text x="615" y="272">19 Oct</text><text x="765" y="272">20 Oct</text></g>
+      </svg>
+      <figcaption>Figure 3. Databricks spend at list price per day. 20 October was the 78-million-row online load in four batches, with reconciliation after each and full Power BI refreshes. Actual Azure charges for the same days: USD 5.89.</figcaption>
+    </figure>
+    <h3>Where the money went on the expensive day</h3>
+    <p>Four separate batches each paid their own start-up, reconciliation ran after every batch instead of once, and Power BI imported the full row-level facts. The rules since then: larger batches, light checks per batch with the full ladder once at the end, summaries first in Power BI, and the warehouse stopped straight after validation.</p>
+  </section>
+
+  <section id="ch9">
+    <div class="chapter-num">Chapter 9</div>
+    <h2>Dev and prod</h2>
+    <p>The rehearsal ran in one workspace. The real project will use two, <code>dev</code> and <code>prod</code>, each with its own catalog bound only to its own workspace, its own storage, Key Vault and service principal. Only code moves between them, through a reviewed pull request and an approval gate. Data never moves from dev to prod; prod rebuilds from its own Bronze. Dev works on synthetic or masked samples only.</p>
+    <figure class="figure" id="fig4">
+      <svg viewBox="0 0 900 260" width="900" height="260" role="img" aria-label="Dev to prod promotion barrier">
+        <defs><marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+        <rect x="10" y="40" width="270" height="190" rx="8" fill="var(--slate-soft)" stroke="var(--slate)" stroke-width="1.5"/>
+        <text x="25" y="65" font-size="15" font-weight="600" fill="var(--ink)">Dev workspace</text>
+        <text x="25" y="95" font-size="13" fill="var(--muted)">synthetic or masked samples</text>
+        <text x="25" y="118" font-size="13" fill="var(--muted)">Bronze · Silver · Gold · ops</text>
+        <text x="25" y="141" font-size="13" fill="var(--muted)">schedules paused</text>
+        <text x="25" y="164" font-size="13" fill="var(--muted)">kill switch on</text>
+        <rect x="330" y="40" width="240" height="190" rx="8" fill="var(--copper-soft)" stroke="var(--copper)" stroke-width="1.5"/>
+        <text x="345" y="65" font-size="15" font-weight="600" fill="var(--ink)">Promotion</text>
+        <text x="345" y="95" font-size="13" fill="var(--muted)">pull request + CI tests</text>
+        <text x="345" y="118" font-size="13" fill="var(--muted)">review by two engineers</text>
+        <text x="345" y="141" font-size="13" fill="var(--muted)">approval gate</text>
+        <text x="345" y="164" font-size="13" fill="var(--ink)" font-weight="600">code and config only</text>
+        <rect x="620" y="40" width="270" height="190" rx="8" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width="1.5"/>
+        <text x="635" y="65" font-size="15" font-weight="600" fill="var(--ink)">Prod workspace</text>
+        <text x="635" y="95" font-size="13" fill="var(--muted)">real sources only</text>
+        <text x="635" y="118" font-size="13" fill="var(--muted)">gates fail closed</text>
+        <text x="635" y="141" font-size="13" fill="var(--muted)">alerts, timeouts, runbooks</text>
+        <text x="635" y="164" font-size="13" fill="var(--muted)">protected backup</text>
+        <g stroke="var(--muted)" stroke-width="1.4" fill="none" marker-end="url(#a4)"><path d="M280 120 H328"/><path d="M570 120 H618"/></g>
+        <path d="M150 200 H300" stroke="var(--bad)" stroke-width="1.4" stroke-dasharray="5 4"/>
+        <text x="305" y="205" font-size="16" fill="var(--bad)" font-weight="600">✕</text>
+        <text x="150" y="222" font-size="12" fill="var(--bad)">dev data stops at the barrier</text>
+      </svg>
+      <figcaption>Figure 4. Dev data ends at the promotion barrier. Only reviewed code, schemas, tests and configuration reach prod.</figcaption>
+    </figure>
+    <p>Cost note: a second workspace with private networking adds a fixed network gateway charge of about USD 35 a month even when idle, so the decision belongs at project start, as a line item.</p>
+  </section>
+
+  <section id="ch10">
+    <div class="chapter-num">Chapter 10</div>
+    <h2>Catalogue and reports</h2>
+    <p>A single YAML file describes every table and column once: owner, domain, grain, source, refresh and personal-data class. A script turns it into Unity Catalog comments and tags and a live catalogue view that also shows each table's latest quality failure rate, reconciliation status and freshness. The first run described 171 objects and 2,120 columns and tagged 17 objects as holding personal data. A business glossary links each term, such as GGR, to the columns that implement it.</p>
+    <p>Both Power BI reports are generated as text projects, statically validated before anyone opens them, and read the Gold summaries by default. Detail tables load only a bounded date window, and a Reconciliation page shows the summaries matching the detail for the selected days.</p>
+  </section>
+
+  <section id="ch11">
+    <div class="chapter-num">Chapter 11</div>
+    <h2>Lessons for the real project</h2>
+    <ol>
+      <li><b>Aggregate upstream.</b> Summaries in Gold were the single largest cost and speed win.</li>
+      <li><b>Integrity is a gate, not a report.</b> Declare the grain of every Silver model and fail the build on a duplicate key.</li>
+      <li><b>Reconcile every hop</b> and record the first failing layer, with cause codes and history.</li>
+      <li><b>Serverless by default.</b> A classic cluster only on a measured need, isolated to one task.</li>
+      <li><b>List price is not the bill.</b> Use the cloud bill for totals and usage tables for attribution; watch fixed network costs.</li>
+      <li><b>API sources cost waiting time, not rows.</b> Measure throughput with a capped probe before any backfill.</li>
+      <li><b>Small tooling traps are real:</b> shells that rewrite paths, quotes stripped from arguments, partition columns missing from Parquet files, hashes that turn NULL, metadata changes that conflict in parallel.</li>
+      <li><b>Two reviewers beat one.</b> Every change was argued in a pull request until both wrote AGREE; disagreements twice on one point went to a human.</li>
+    </ol>
+  </section>
+
+  <section id="ch12">
+    <div class="chapter-num">Chapter 12</div>
+    <h2>Epilogue: switching it off</h2>
+    <p>A rehearsal should end on purpose. A scheduled runbook deletes the Databricks workspace one day before the trial ends, or immediately if spend ever reaches the full budget, whichever comes first. The network gateway goes with it. The data stays in storage, the code stays in git, and the whole platform can be rebuilt from Terraform in about an hour when the real project begins.</p>
+  </section>
+
+  <section id="figures">
+    <h2>Figures</h2>
+    <ul>
+      <li><a href="#fig1">Figure 1. One load with fail-closed gates</a></li>
+      <li><a href="#fig2">Figure 2. Rows imported before and after summaries</a></li>
+      <li><a href="#fig3">Figure 3. Spend per day at list price</a></li>
+      <li><a href="#fig4">Figure 4. Dev to prod promotion barrier</a></li>
+    </ul>
+  </section>
+
+  <footer>Lumen Ridge is fictional; all data is synthetic. Written by Claude, reviewed by Codex. Suggestions welcome as GitHub issues.</footer>
+</div>
+</body>
+</html>

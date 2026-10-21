@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lumen Ridge Lakehouse</title>
+<meta name="description" content="A fictional gaming operator, a USD 200 budget and a full Azure Databricks lakehouse rehearsal: the story, the numbers and the lessons.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<div class="wrap">
+  <nav class="top"><a class="brand" href="./">Lumen Ridge Lakehouse</a><a href="ebook.html">The ebook</a><a href="ebook.html#ch11">Lessons</a><a href="ebook.html#figures">Figures</a></nav>
+
+  <div class="kicker">A rehearsal, told as a story · October 2026</div>
+  <h1>Building a gaming lakehouse on USD 200 a month</h1>
+  <p class="lede">Lumen Ridge is a fictional betting operator with an online casino, a sportsbook and a chain of retail betting shops. Before wiring up its real sources, the data team rehearsed the whole platform end to end on synthetic data, with two AI engineers, Claude and Codex, building and reviewing each other's work in public pull requests.</p>
+
+  <div class="facts">
+    <div class="fact"><b>221.6M</b><span>synthetic rows landed (online 106.7M, retail 114.9M)</span></div>
+    <div class="fact"><b>0</b><span>duplicate keys across 25 Silver and Gold grain checks</span></div>
+    <div class="fact"><b>53 s</b><span>to build seven Gold daily summaries that match their facts exactly</span></div>
+    <div class="fact"><b>USD 5.89</b><span>actually billed by Azure in the first week (list-price value USD 45.87)</span></div>
+  </div>
+
+  <h2>The storyline</h2>
+  <p>The brief was blunt: seven sources (five APIs, a PostgreSQL database and a file feed), finance-grade reconciliation, and a budget of USD 200 a month with a kill switch at USD 190. Nobody wanted to discover on the real data that a pipeline double counts a bet, that a Power BI refresh takes twenty minutes, or that an idle network gateway quietly costs more than the compute.</p>
+  <p>So the team built a dress rehearsal. Two generators produced a dirty, realistic month of online play and retail shop activity, complete with late arrivals, re-sent files, conflicting versions and missing settlements. Everything else was real: Azure Databricks with Unity Catalog, Terraform, a budget with alerts, dbt, Power BI, a ClickHouse copy for comparison, and a GitHub repository where every change was argued over until both reviewers wrote AGREE.</p>
+  <p>The ebook follows that rehearsal chapter by chapter, from the first landed file to the scheduled teardown, with the figures, the costs and the mistakes left in.</p>
+
+  <h2>Inside the ebook</h2>
+  <ol class="toc">
+    <li><a href="ebook.html#ch1">The brief and the budget</a></li>
+    <li><a href="ebook.html#ch2">Synthetic data that misbehaves</a></li>
+    <li><a href="ebook.html#ch3">The architecture</a></li>
+    <li><a href="ebook.html#ch4">Landing without duplicates</a></li>
+    <li><a href="ebook.html#ch5">Silver rules as data</a></li>
+    <li><a href="ebook.html#ch6">Gold and the 53-second summaries</a></li>
+    <li><a href="ebook.html#ch7">Reconciliation first</a></li>
+    <li><a href="ebook.html#ch8">What it cost, and why the bill disagreed</a></li>
+    <li><a href="ebook.html#ch9">Dev and prod</a></li>
+    <li><a href="ebook.html#ch10">Catalogue and reports</a></li>
+    <li><a href="ebook.html#ch11">Lessons for the real project</a></li>
+    <li><a href="ebook.html#ch12">Epilogue: switching it off</a></li>
+  </ol>
+
+  <footer>Lumen Ridge is fictional; all data is synthetic. Figures are from the rehearsal, 16–21 October 2026. Written by Claude, reviewed by Codex.</footer>
+</div>
+</body>
+</html>
