@@ -11,13 +11,14 @@
 <body>
 <a class="skip-link" href="#main">Skip to the ebook</a>
 <div class="wrap">
-  <nav class="top" aria-label="Ebook navigation"><a class="brand" href="./">Lumen Ridge Lakehouse</a><a href="#contents">Contents</a><a href="#evidence">Evidence</a><a href="#figures">Figures</a><a href="#index">Index</a></nav>
+  <nav class="top" aria-label="Ebook navigation"><a class="brand" href="./">Lumen Ridge Lakehouse</a><a href="#contents">Contents</a><a href="#toolchain">Tools</a><a href="#evidence">Evidence</a><a href="#figures">Figures</a><a href="#index">Index</a><a class="download" href="assets/Lumen-Ridge-Lakehouse-ebook.pdf" download>Download PDF</a></nav>
   <main id="main">
 
   <div class="kicker">The ebook · 12 chapters · about 25 minutes</div>
   <h1>Rehearsing a lakehouse before the real data arrives</h1>
   <p class="lede">A measured rehearsal of a complete lakehouse: what the team built, how it prevented bad data reaching reports, what it cost, and what must change before production.</p>
   <p class="status-note"><strong>Reading note.</strong> This is a fictional operator and synthetic data. Numbers marked as measured came from the rehearsal; costs are labelled either Azure charges or Databricks list-price usage. Open controls are stated rather than hidden.</p>
+  <p class="pdf-note"><strong>Prefer a document?</strong> <a href="assets/Lumen-Ridge-Lakehouse-ebook.pdf" download>Download the print-ready PDF</a>. It includes the full reference diagrams and is designed for sharing offline.</p>
 
   <nav id="contents" aria-label="Ebook contents"><ol class="toc">
     <li><a href="#ch1">The brief and the budget</a></li><li><a href="#ch2">Synthetic data that misbehaves</a></li>
@@ -79,6 +80,24 @@
       </svg>
       <figcaption>Figure 1. One load, layer by layer. Each gate fails closed: a failed check stops the run before Gold or any report changes.<span class="figure-note">Source: rehearsal control design. This is the target operating model; remaining production gates are listed in the evidence note.</span></figcaption>
     </figure>
+  </section>
+
+  <section id="toolchain">
+    <div class="chapter-num">How the platform was built</div>
+    <h2>The tools, and the job each one does</h2>
+    <p>Consistency comes from the control rules and their evidence, not from forcing every workload through one product. This is the toolchain used in the rehearsal and the intended responsibility of each part.</p>
+    <table class="tool-table">
+      <thead><tr><th>Tool</th><th>Role in the rehearsal</th><th>Boundary</th></tr></thead>
+      <tbody>
+        <tr><td>Azure Databricks + Delta Lake</td><td>Serverless compute and durable Bronze, Silver and Gold tables.</td><td>Stops when idle; cluster use needs a measured exception.</td></tr>
+        <tr><td>Unity Catalog</td><td>Catalogs, access rules, lineage, audit metadata, tags and personal-data controls.</td><td>One catalog and storage boundary per environment.</td></tr>
+        <tr><td>Lakeflow Jobs</td><td>Runs the retail landing step before its transformation task, and schedules controlled workloads.</td><td>A failed upstream task prevents the next one from starting.</td></tr>
+        <tr><td>dbt</td><td>Retail Silver and Gold transformations, tests and daily summary models.</td><td>Only approved models become physical tables; single-use intermediates stay ephemeral or views.</td></tr>
+        <tr><td>Python and SQL notebooks</td><td>Online ingestion, Silver, Gold and reconciliation.</td><td>dbt work for online remains a comparison experiment, not a production dependency.</td></tr>
+        <tr><td>GitHub CI/CD + Terraform</td><td>Reviews code, contracts, tests, job configuration and infrastructure plans.</td><td>Promotes code and configuration only; never raw development data.</td></tr>
+        <tr><td>Power BI</td><td>Consumes Gold aggregates first; detail facts support bounded drill-through.</td><td>Reconciles report totals to Gold and releases its warehouse after validation.</td></tr>
+      </tbody>
+    </table>
   </section>
 
   <section id="ch4">
@@ -260,3 +279,4 @@
 </div>
 </body>
 </html>
+
