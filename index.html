@@ -9,18 +9,21 @@
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to the story</a>
 <div class="wrap">
-  <nav class="top"><a class="brand" href="./">Lumen Ridge Lakehouse</a><a href="ebook.html">The ebook</a><a href="ebook.html#ch11">Lessons</a><a href="ebook.html#figures">Figures</a></nav>
+  <nav class="top" aria-label="Primary navigation"><a class="brand" href="./">Lumen Ridge Lakehouse</a><a href="ebook.html">Read the ebook</a><a href="ebook.html#evidence">Evidence</a><a href="ebook.html#index">Index</a></nav>
+  <main id="main">
 
   <div class="kicker">A rehearsal, told as a story · October 2026</div>
   <h1>Building a gaming lakehouse on USD 200 a month</h1>
-  <p class="lede">Lumen Ridge is a fictional betting operator with an online casino, a sportsbook and a chain of retail betting shops. Before wiring up its real sources, the data team rehearsed the whole platform end to end on synthetic data, with two AI engineers, Claude and Codex, building and reviewing each other's work in public pull requests.</p>
+  <p class="lede">Lumen Ridge is a fictional betting operator with an online casino, a sportsbook and retail betting shops. Before connecting real sources, the team rehearsed the platform end to end on synthetic data and recorded the evidence, trade-offs and failures.</p>
+  <p class="status-note"><strong>This is a rehearsal, not a production claim.</strong> The figures are measured from a synthetic test; costs distinguish list-price workload from Azure charges during a trial.</p>
 
   <div class="facts">
     <div class="fact"><b>221.6M</b><span>synthetic rows landed (online 106.7M, retail 114.9M)</span></div>
     <div class="fact"><b>0</b><span>duplicate keys across 25 Silver and Gold grain checks</span></div>
     <div class="fact"><b>53 s</b><span>to build seven Gold daily summaries that match their facts exactly</span></div>
-    <div class="fact"><b>USD 5.89</b><span>actually billed by Azure in the first week (list-price value USD 45.87)</span></div>
+    <div class="fact"><b>USD 5.89</b><span>Azure charges shown during the first week; Databricks list-price usage was USD 45.87</span></div>
   </div>
 
   <h2>The storyline</h2>
@@ -44,6 +47,12 @@
     <li><a href="ebook.html#ch12">Epilogue: switching it off</a></li>
   </ol>
 
+  <section class="evidence" id="evidence">
+    <h2>Evidence and limits</h2>
+    <p>The row counts, duplicate-key checks and 53-second summary build are measured rehearsal results. The duplicate result covers 25 tested Silver and Gold grains in the local validation copy; it is not a claim that every future source is duplicate-free. Azure charges and Databricks list-price usage are different measures and are shown separately.</p>
+    <p><a href="ebook.html">Read the methods, figures, remaining tests and lessons in the ebook.</a></p>
+  </section>
+  </main>
   <footer>Lumen Ridge is fictional; all data is synthetic. Figures are from the rehearsal, 16–21 October 2026. Written by Claude, reviewed by Codex.</footer>
 </div>
 </body>
