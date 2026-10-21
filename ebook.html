@@ -175,13 +175,13 @@
     <h2>Dev and prod</h2>
     <p>The rehearsal ran in one workspace. The real project will use two, <code>dev</code> and <code>prod</code>, each with its own catalog bound only to its own workspace, its own storage, Key Vault and service principal. Only code moves between them, through a reviewed pull request and an approval gate. Data never moves from dev to prod; prod rebuilds from its own Bronze. Dev works on synthetic or masked samples only.</p>
     <figure class="figure" id="fig4">
-      <svg viewBox="0 0 1040 320" width="1040" height="320" role="img" aria-label="Dev to prod promotion barrier: RavenTrack and ALEA fixtures stay in dev, while production reads its own sources after reviewed code and configuration pass through a promotion gate.">
+      <svg viewBox="0 0 1040 320" width="1040" height="320" role="img" aria-label="Dev to prod promotion barrier: Source A and Source B fixtures stay in dev, while production reads its own sources after reviewed code and configuration pass through a promotion gate.">
         <defs><marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
         <rect x="20" y="46" width="285" height="218" rx="9" fill="var(--slate-soft)" stroke="var(--slate)" stroke-width="1.5"/>
         <text x="40" y="76" font-size="16" font-weight="600" fill="var(--ink)">Dev workspace</text>
-        <text x="40" y="106" font-size="13" fill="var(--muted)">RavenTrack + ALEA fixtures</text>
+        <text x="40" y="106" font-size="13" fill="var(--muted)">Source A + Source B fixtures</text>
         <text x="40" y="129" font-size="13" fill="var(--muted)">synthetic or masked only</text>
-        <text x="40" y="152" font-size="13" fill="var(--muted)">jsb_dev catalog + storage</text>
+        <text x="40" y="152" font-size="13" fill="var(--muted)">lumen_dev catalog + storage</text>
         <text x="40" y="175" font-size="13" fill="var(--muted)">Bronze · Silver · Gold · ops</text>
         <text x="40" y="198" font-size="13" fill="var(--muted)">PII masking · schedules paused</text>
 
@@ -194,8 +194,8 @@
 
         <rect x="735" y="46" width="285" height="218" rx="9" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width="1.5"/>
         <text x="755" y="76" font-size="16" font-weight="600" fill="var(--ink)">Prod workspace</text>
-        <text x="755" y="106" font-size="13" fill="var(--muted)">RavenTrack + ALEA real sources</text>
-        <text x="755" y="129" font-size="13" fill="var(--muted)">jsb_prod catalog + storage</text>
+        <text x="755" y="106" font-size="13" fill="var(--muted)">Source A + Source B real sources</text>
+        <text x="755" y="129" font-size="13" fill="var(--muted)">lumen_prod catalog + storage</text>
         <text x="755" y="152" font-size="13" fill="var(--muted)">manifest · grain · unique gates</text>
         <text x="755" y="175" font-size="13" fill="var(--muted)">reconciliation · summary = fact</text>
         <text x="755" y="198" font-size="13" fill="var(--muted)">alerts · protected backup</text>
@@ -206,7 +206,7 @@
         <text x="375" y="248" font-size="17" fill="var(--bad)" font-weight="600">✕</text>
         <text x="140" y="286" font-size="12.5" fill="var(--bad)">raw dev data stops here — no data path into prod</text>
       </svg>
-      <figcaption>Figure 4. Dev and prod have separate workspaces, catalogs and storage. Production reads its own RavenTrack and ALEA sources; only reviewed code and configuration cross the promotion boundary.<span class="figure-note">Target design for the real project. Private networking and source connectivity remain security-design decisions.</span></figcaption>
+      <figcaption>Figure 4. Dev and prod have separate workspaces, catalogs and storage. Production reads its own Source A and Source B sources; only reviewed code and configuration cross the promotion boundary.<span class="figure-note">Target design for the real project. Private networking and source connectivity remain security-design decisions.</span></figcaption>
     </figure>
     <p>Cost note: a second workspace with private networking adds a fixed network gateway charge of about USD 35 a month even when idle, so the decision belongs at project start, as a line item.</p>
   </section>
@@ -236,7 +236,7 @@
   <section class="evidence" id="evidence">
     <h2>Evidence and limits</h2>
     <p><strong>Measured in the rehearsal:</strong> 221.6M synthetic rows landed; zero duplicate keys in 25 tested retail Silver and Gold grains; seven Gold summaries built in 53 seconds; their row and money totals matched the related facts. The online Silver-to-Gold checks also matched on the tested controls.</p>
-    <p><strong>Not yet production evidence:</strong> real RavenTrack and ALEA source contracts, Bronze raw-payload/hash metadata, tombstone and replay tests, translation drift tests, a shared API runner and operations schema, retail masking, and the complete first-failing-layer reconciliation ladder. These remain release gates before real data is trusted.</p>
+    <p><strong>Not yet production evidence:</strong> real Source A and Source B source contracts, Bronze raw-payload/hash metadata, tombstone and replay tests, translation drift tests, a shared API runner and operations schema, retail masking, and the complete first-failing-layer reconciliation ladder. These remain release gates before real data is trusted.</p>
     <p><strong>Cost limit:</strong> Azure charges and Databricks list-price usage are separate measures. Trial credits can hide compute on an invoice; network and storage charges remain visible in Azure Cost Management.</p>
   </section>
 
