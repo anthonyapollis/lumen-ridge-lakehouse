@@ -5,22 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lumen Ridge Lakehouse · The ebook</title>
 <meta name="description" content="Twelve chapters on rehearsing an Azure Databricks lakehouse for a fictional gaming operator: architecture, integrity, reconciliation, cost and dev/prod.">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to the ebook</a>
-<div class="wrap">
-  <nav class="top" aria-label="Ebook navigation"><a class="brand" href="./">Lumen Ridge Lakehouse</a><a href="#contents">Contents</a><a href="#toolchain">Tools</a><a href="#evidence">Evidence</a><a href="#figures">Figures</a><a href="#index">Index</a><a class="download" href="assets/Lumen-Ridge-Lakehouse-ebook.pdf" download>Download PDF</a></nav>
+<div class="reading-progress" aria-hidden="true"><span></span></div>
+<div class="site-shell">
+  <nav class="top" aria-label="Ebook navigation"><a class="brand" href="./"><span class="brand-mark">LR</span><span>Lumen Ridge<br><small>Lakehouse field notes</small></span></a><div class="nav-links"><a href="#contents">Contents</a><a href="#toolchain">Tools</a><a href="#evidence">Evidence</a><a href="#index">Index</a><a class="download" href="assets/Lumen-Ridge-Lakehouse-ebook.pdf" download>Download PDF</a></div></nav>
   <main id="main">
 
-  <div class="kicker">The ebook · 12 chapters · about 25 minutes</div>
-  <h1>Rehearsing a lakehouse before the real data arrives</h1>
-  <p class="lede">A measured rehearsal of a complete lakehouse: what the team built, how it prevented bad data reaching reports, what it cost, and what must change before production.</p>
-  <p class="status-note"><strong>Reading note.</strong> This is a fictional operator and synthetic data. Numbers marked as measured came from the rehearsal; costs are labelled either Azure charges or Databricks list-price usage. Open controls are stated rather than hidden.</p>
-  <p class="pdf-note"><strong>Prefer a document?</strong> <a href="assets/Lumen-Ridge-Lakehouse-ebook.pdf" download>Download the print-ready PDF</a>. It includes the complete set of diagrams and is designed for sharing offline.</p>
+  <header class="book-hero">
+    <div class="hero-copy">
+      <div class="kicker">A measured engineering story · 12 chapters</div>
+      <h1>Rehearsing a lakehouse <em>before</em> the real data arrives</h1>
+      <p class="lede">A small team built the entire platform on synthetic data first—then followed every duplicate, cost spike and broken assumption until the architecture could explain itself.</p>
+      <div class="hero-actions"><a class="button primary" href="#contents">Start reading</a><a class="button secondary" href="assets/Lumen-Ridge-Lakehouse-ebook.pdf" download>Download the PDF</a></div>
+      <p class="hero-note">Fictional operator · Synthetic data · Measured results clearly labelled</p>
+    </div>
+    <div class="hero-art" aria-label="Bronze, Silver and Gold data layers passing through an integrity gate to business reporting" role="img">
+      <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+      <div class="layer-card bronze"><span>01</span><strong>Bronze</strong><small>Evidence preserved</small></div>
+      <div class="layer-card silver"><span>02</span><strong>Silver</strong><small>Typed and trusted</small></div>
+      <div class="layer-card gold"><span>03</span><strong>Gold</strong><small>Business ready</small></div>
+      <div class="gate-chip"><i></i> Integrity gate</div>
+    </div>
+    <div class="hero-stats" aria-label="Measured rehearsal results">
+      <div><strong>221.6M</strong><span>synthetic rows landed</span></div>
+      <div><strong>0</strong><span>duplicate keys in 25 tested grains</span></div>
+      <div><strong>53 sec</strong><span>seven Gold summaries</span></div>
+      <div><strong>USD 0.04</strong><span>measured summary build</span></div>
+    </div>
+  </header>
 
-  <nav id="contents" aria-label="Ebook contents"><ol class="toc">
+  <aside class="status-note"><span>Scope</span><p>This is a rehearsal, not a production claim. Measured results, estimates and remaining controls are kept visibly separate throughout.</p></aside>
+
+  <nav id="contents" class="contents-card" aria-label="Ebook contents"><div class="section-label">Reading map</div><h2>Follow the evidence, not the sales pitch</h2><p>The story moves from the brief to the controls, the bill, and the production decisions that survived testing.</p><ol class="toc">
     <li><a href="#ch1">The brief and the budget</a></li><li><a href="#ch2">Synthetic data that misbehaves</a></li>
     <li><a href="#ch3">The architecture</a></li><li><a href="#ch4">Landing without duplicates</a></li>
     <li><a href="#ch5">Silver rules as data</a></li><li><a href="#ch6">Gold and the 53-second summaries</a></li>
@@ -173,7 +193,7 @@
   <section id="ch9">
     <div class="chapter-num">Chapter 9</div>
     <h2>Dev and prod</h2>
-    <p>The rehearsal ran in one workspace. The real project will use two, <code>dev</code> and <code>prod</code>, each with its own catalog bound only to its own workspace, its own storage, Key Vault and service principal. Only code moves between them, through a reviewed pull request and an approval gate. Data never moves from dev to prod; prod rebuilds from its own Bronze. Dev works on synthetic or masked samples only.</p>
+    <p>The rehearsal ran in one workspace. The cost-first target uses a persistent <code>prod</code> workspace and an on-demand <code>dev</code> workspace created only for approved change cycles. Each keeps its own catalog boundary, storage, secrets and identity. Only reviewed code and configuration cross the promotion boundary. Data never moves from dev to prod; prod rebuilds from its own Bronze, while dev uses synthetic or masked samples only.</p>
     <figure class="figure" id="fig4">
       <svg viewBox="0 0 1040 320" width="1040" height="320" role="img" aria-label="Dev to prod promotion barrier: Source A and Source B fixtures stay in dev, while production reads its own sources after reviewed code and configuration pass through a promotion gate.">
         <defs><marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
@@ -208,7 +228,7 @@
       </svg>
       <figcaption>Figure 4. Dev and prod have separate workspaces, catalogs and storage. Production reads its own Source A and Source B sources; only reviewed code and configuration cross the promotion boundary.<span class="figure-note">Target design for the real project. Private networking and source connectivity remain security-design decisions.</span></figcaption>
     </figure>
-    <p>Cost note: a second workspace with private networking adds a fixed network gateway charge of about USD 35 a month even when idle, so the decision belongs at project start, as a line item.</p>
+    <p>Cost note: the rehearsal measured roughly USD 35–36 a month for one managed NAT gateway and public IP in its region. Production keeps that boundary; development is destroyed when idle so its gateway cost follows the days it exists. This is a planning estimate, not a universal Azure price.</p>
   </section>
 
   <section id="ch10">
@@ -275,8 +295,18 @@
   </section>
 
   </main>
-  <footer>Lumen Ridge is fictional; all data is synthetic. Written by Claude, reviewed by Codex. Suggestions welcome as GitHub issues.</footer>
+  <footer><div><strong>Lumen Ridge Lakehouse</strong><span>A fictional operator. All data is synthetic.</span></div><p>Built as an engineering rehearsal. Written by Claude, reviewed and refined by Codex.</p><a href="#main">Back to top ↑</a></footer>
 </div>
+<script>
+  const progress = document.querySelector('.reading-progress span');
+  const updateProgress = () => {
+    const page = document.documentElement;
+    const distance = page.scrollHeight - page.clientHeight;
+    progress.style.width = (distance ? (page.scrollTop / distance) * 100 : 0) + '%';
+  };
+  addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+</script>
 </body>
 </html>
 

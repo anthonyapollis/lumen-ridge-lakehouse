@@ -3,59 +3,104 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Lumen Ridge Lakehouse</title>
-<meta name="description" content="A fictional gaming operator, a USD 200 budget and a full Azure Databricks lakehouse rehearsal: the story, the numbers and the lessons.">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<title>Lumen Ridge Lakehouse — an evidence-led data platform rehearsal</title>
+<meta name="description" content="A fictional gaming operator, a USD 200 budget and a full Azure Databricks lakehouse rehearsal: the story, the evidence and the lessons.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;600&family=Manrope:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to the story</a>
-<div class="wrap">
-  <nav class="top" aria-label="Primary navigation"><a class="brand" href="./">Lumen Ridge Lakehouse</a><a href="ebook.html">Read the ebook</a><a href="ebook.html#toolchain">Tools used</a><a href="ebook.html#evidence">Evidence</a><a href="ebook.html#index">Index</a><a class="download" href="assets/Lumen-Ridge-Lakehouse-ebook.pdf" download>Download PDF</a></nav>
+<div class="site-shell">
+  <nav class="top" aria-label="Primary navigation">
+    <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">LR</span><span>Lumen Ridge<br><small>Lakehouse rehearsal</small></span></a>
+    <div class="nav-links">
+      <a href="ebook.html">Read</a>
+      <a href="ebook.html#toolchain">Tools</a>
+      <a href="ebook.html#evidence">Evidence</a>
+      <a class="download" href="assets/Lumen-Ridge-Lakehouse-ebook.pdf" download>PDF ↓</a>
+    </div>
+  </nav>
+
   <main id="main">
+    <header class="book-hero landing-hero">
+      <div class="hero-copy">
+        <p class="kicker">Field notes from a controlled rehearsal · October 2026</p>
+        <h1>Build the evidence<br>before the pressure.</h1>
+        <p class="lede">A small team rehearsed a gaming lakehouse end to end on synthetic data, then recorded what held, what failed and what the platform actually cost.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="ebook.html">Read the ebook <span aria-hidden="true">→</span></a>
+          <a class="button secondary" href="assets/Lumen-Ridge-Lakehouse-ebook.pdf" download>Download PDF <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+      <div class="hero-art" aria-label="The rehearsal moves synthetic source data through Bronze, Silver and Gold, with integrity gates before reporting.">
+        <div class="orbit orbit-one" aria-hidden="true"></div>
+        <div class="orbit orbit-two" aria-hidden="true"></div>
+        <div class="layer-card bronze"><span>01</span><strong>Bronze</strong><small>Immutable evidence</small></div>
+        <div class="layer-card silver"><span>02</span><strong>Silver</strong><small>Typed · tested · masked</small></div>
+        <div class="layer-card gold"><span>03</span><strong>Gold</strong><small>Trusted facts · summaries</small></div>
+        <div class="gate-chip"><i></i>Integrity gates</div>
+      </div>
+      <div class="hero-stats" aria-label="Measured results">
+        <div><strong>221.6M</strong><span>rows landed</span></div>
+        <div><strong>0</strong><span>duplicate keys across 25 tested grains</span></div>
+        <div><strong>53 sec</strong><span>seven Gold summaries</span></div>
+        <div><strong>USD 0.04</strong><span>measured summary-build cost</span></div>
+      </div>
+    </header>
 
-  <div class="kicker">A rehearsal, told as a story · October 2026</div>
-  <h1>Building a gaming lakehouse on USD 200 a month</h1>
-  <p class="lede">Lumen Ridge is a fictional betting operator with an online casino, a sportsbook and retail betting shops. Before connecting real sources, the team rehearsed the platform end to end on synthetic data and recorded the evidence, trade-offs and failures.</p>
-  <p class="status-note"><strong>This is a rehearsal, not a production claim.</strong> The figures are measured from a synthetic test; costs distinguish list-price workload from Azure charges during a trial.</p>
+    <section class="status-note" aria-label="Scope note">
+      <span aria-hidden="true">Scope</span>
+      <p><strong>A rehearsal, not a production claim.</strong> The evidence comes from a synthetic test. Measured results, list-price workload and Azure charges are labelled separately throughout.</p>
+    </section>
 
-  <div class="facts">
-    <div class="fact"><b>221.6M</b><span>synthetic rows landed (online 106.7M, retail 114.9M)</span></div>
-    <div class="fact"><b>0</b><span>duplicate keys across 25 Silver and Gold grain checks</span></div>
-    <div class="fact"><b>53 s</b><span>to build seven Gold daily summaries that match their facts exactly</span></div>
-    <div class="fact"><b>USD 5.89</b><span>Azure charges shown during the first week; Databricks list-price usage was USD 45.87</span></div>
-  </div>
+    <section class="editorial-grid">
+      <div>
+        <p class="section-label">The assignment</p>
+        <h2>Find the failures while failure is still cheap.</h2>
+      </div>
+      <div class="story-copy">
+        <p>The brief was blunt: seven sources, finance-grade reconciliation, and a USD 200 monthly ceiling with a kill switch at USD 190. Nobody wanted to discover on live data that a pipeline double-counted a bet, that a report depended on raw fact-to-fact joins, or that idle networking cost more than useful compute.</p>
+        <p>So the team built a dress rehearsal. Two generators produced a dirty month of online and retail activity, including late arrivals, re-sent files, conflicting versions and missing settlements. The platform around it was real: Azure Databricks, Unity Catalog, Terraform, dbt, Power BI, ClickHouse and GitHub.</p>
+        <p>The result is a practical account of the controls that mattered: immutable Bronze evidence, explicit Silver rules, dimensional Gold models, reconciliation, cost boundaries and a promotion barrier between development and production.</p>
+      </div>
+    </section>
 
-  <h2>The storyline</h2>
-  <p>The brief was blunt: seven sources (five APIs, a PostgreSQL database and a file feed), finance-grade reconciliation, and a budget of USD 200 a month with a kill switch at USD 190. Nobody wanted to discover on the real data that a pipeline double counts a bet, that a Power BI refresh takes twenty minutes, or that an idle network gateway quietly costs more than the compute.</p>
-  <p>So the team built a dress rehearsal. Two generators produced a dirty, realistic month of online play and retail shop activity, complete with late arrivals, re-sent files, conflicting versions and missing settlements. Everything else was real: Azure Databricks with Unity Catalog, Terraform, a budget with alerts, dbt, Power BI, a ClickHouse copy for comparison, and a GitHub repository where every change was argued over until both reviewers wrote AGREE.</p>
-  <p>The ebook follows that rehearsal chapter by chapter, from the first landed file to the scheduled teardown, with the figures, the costs and the mistakes left in.</p>
-  <p><a class="download" href="assets/Lumen-Ridge-Lakehouse-ebook.pdf" download>Download the complete print-ready ebook (PDF)</a></p>
+    <section class="contents-card home-contents">
+      <div class="contents-intro">
+        <p class="section-label">Twelve chapters · about 25 minutes</p>
+        <h2>Follow the evidence,<br>not the sales pitch.</h2>
+        <p>The story starts with a budget and ends with a deliberate teardown. Every major claim is paired with a measured result, a method or a stated limitation.</p>
+      </div>
+      <ol class="toc">
+        <li><a href="ebook.html#ch1">The brief and the budget</a></li>
+        <li><a href="ebook.html#ch2">Synthetic data that misbehaves</a></li>
+        <li><a href="ebook.html#ch3">The architecture</a></li>
+        <li><a href="ebook.html#ch4">Landing without duplicates</a></li>
+        <li><a href="ebook.html#ch5">Silver rules as data</a></li>
+        <li><a href="ebook.html#ch6">Gold and the 53-second summaries</a></li>
+        <li><a href="ebook.html#ch7">Reconciliation first</a></li>
+        <li><a href="ebook.html#ch8">What it cost</a></li>
+        <li><a href="ebook.html#ch9">Dev and prod</a></li>
+        <li><a href="ebook.html#ch10">Catalogue and reports</a></li>
+        <li><a href="ebook.html#ch11">Lessons for the real project</a></li>
+        <li><a href="ebook.html#ch12">Epilogue: switching it off</a></li>
+      </ol>
+    </section>
 
-  <h2>Inside the ebook</h2>
-  <ol class="toc">
-    <li><a href="ebook.html#ch1">The brief and the budget</a></li>
-    <li><a href="ebook.html#ch2">Synthetic data that misbehaves</a></li>
-    <li><a href="ebook.html#ch3">The architecture</a></li>
-    <li><a href="ebook.html#ch4">Landing without duplicates</a></li>
-    <li><a href="ebook.html#ch5">Silver rules as data</a></li>
-    <li><a href="ebook.html#ch6">Gold and the 53-second summaries</a></li>
-    <li><a href="ebook.html#ch7">Reconciliation first</a></li>
-    <li><a href="ebook.html#ch8">What it cost, and why the bill disagreed</a></li>
-    <li><a href="ebook.html#ch9">Dev and prod</a></li>
-    <li><a href="ebook.html#ch10">Catalogue and reports</a></li>
-    <li><a href="ebook.html#ch11">Lessons for the real project</a></li>
-    <li><a href="ebook.html#ch12">Epilogue: switching it off</a></li>
-  </ol>
-
-  <section class="evidence" id="evidence">
-    <h2>Evidence and limits</h2>
-    <p>The row counts, duplicate-key checks and 53-second summary build are measured rehearsal results. The duplicate result covers 25 tested Silver and Gold grains in the local validation copy; it is not a claim that every future source is duplicate-free. Azure charges and Databricks list-price usage are different measures and are shown separately.</p>
-    <p><a href="ebook.html">Read the methods, figures, remaining tests and lessons in the ebook.</a></p>
-  </section>
+    <section class="evidence" id="evidence">
+      <p class="section-label">Evidence and limits</p>
+      <h2>Clear about what was measured.</h2>
+      <p>The row counts, duplicate-key checks and 53-second summary build are measured rehearsal results. The duplicate result covers 25 tested Silver and Gold grains; it is not a claim that every future source is duplicate-free. Azure charges and Databricks list-price usage are different measures and are shown separately.</p>
+      <p><a class="text-link" href="ebook.html#evidence">Read the methods, remaining tests and limitations <span aria-hidden="true">→</span></a></p>
+    </section>
   </main>
-  <footer>Lumen Ridge is fictional; all data is synthetic. Figures are from the rehearsal, 16–21 October 2026. Written by Claude, reviewed by Codex.</footer>
+
+  <footer>
+    <div><span class="brand-mark small" aria-hidden="true">LR</span><strong>Lumen Ridge Lakehouse</strong></div>
+    <p>Lumen Ridge is fictional and all data is synthetic. Written by Claude, reviewed and redesigned by Codex.</p>
+  </footer>
 </div>
 </body>
 </html>
-
